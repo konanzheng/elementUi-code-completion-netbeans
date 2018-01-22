@@ -85,7 +85,7 @@ public class VueData {
         DOCUMENTATION.put("el-pagination","If you have too much data to display in one page, use pagination.");
         TAG_DATA.put("el-badge", "value,max,is-dot,hidden".split(","));
         DOCUMENTATION.put("el-badge","A number or status mark on buttons and icons.");
-        TAG_DATA.put("el-alert", "title,type,Displays important alert messages.,closable,center,close-text,show-icon,close".split(","));
+        TAG_DATA.put("el-alert", "title,type,closable,center,close-text,show-icon,close".split(","));
         DOCUMENTATION.put("el-alert","description");
         TAG_DATA.put("el-menu", "mode,collapse,background-color,text-color,active-text-color,theme,default-active,default-openeds,unique-opened,menu-trigger,router,select,open,close".split(","));
         DOCUMENTATION.put("el-menu",null);

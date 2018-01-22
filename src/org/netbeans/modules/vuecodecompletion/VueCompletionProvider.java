@@ -39,7 +39,7 @@ public class VueCompletionProvider implements CompletionProvider {
      */
     @Override
     public CompletionTask createTask(int queryType, JTextComponent jTextComponent) {
-        if (queryType != CompletionProvider.COMPLETION_QUERY_TYPE) {
+        if (queryType != CompletionProvider.COMPLETION_QUERY_TYPE && queryType!=CompletionProvider.COMPLETION_ALL_QUERY_TYPE) {
             return null;
         }
         return new AsyncCompletionTask(getAsyncCompletionQuery(), jTextComponent);
@@ -75,15 +75,12 @@ public class VueCompletionProvider implements CompletionProvider {
             protected void query(CompletionResultSet completionResultSet, Document document, int caretOffset) {
 
                 final StyledDocument styledDocument = (StyledDocument) document;
-                String filter = null;
-                int startOffset = caretOffset - 1;
 
                 try {
+                    int startOffset = caretOffset - 1;
+                    String filter = null;
                     final String currentTag = CompletionUtils.getCurrentTagName(styledDocument, caretOffset);
-                    if (currentTag.isEmpty()) {
-                        completionResultSet.finish();
-                        return;
-                    }
+                   
                     final int lineStartOffset = CompletionUtils.getRowFirstNonWhite(styledDocument, caretOffset);
                     final char[] line = styledDocument.getText(lineStartOffset, caretOffset - lineStartOffset).toCharArray();
                     final int whiteOffset = CompletionUtils.getIndexOfLastSpace(line);
@@ -93,30 +90,34 @@ public class VueCompletionProvider implements CompletionProvider {
                     } else {
                         startOffset = lineStartOffset;
                     }
-                    if (!CompletionUtils.insideAttribute((StyledDocument) document, caretOffset)) {
-                        String prefix = "";
-                        if(filter.startsWith(":")||filter.startsWith("@")){
-                            prefix = filter.substring(0, 1);
-                            filter = filter.substring(1);
-//                            startOffset = startOffset + 1;
-                        }
-                        int i =0;
-                        for (String attribute : VueData.getVueAttributes(currentTag.trim())) {
-                            if (attribute.startsWith(filter)) {
-                                i++;
-                                completionResultSet.addItem(new VueCompletionItem(currentTag.trim(),prefix+attribute, startOffset, caretOffset));
+                    if (currentTag.isEmpty()||!currentTag.endsWith(" ")) {
+                        //没有标签
+                        if(!filter.endsWith(">")){
+                            String prefix="<";
+                            if(filter.startsWith(prefix)){
+                                filter = filter.substring(1);
                             }
-                            
+                            for (String tag : VueData.getVueTags()) {
+                                if (tag.startsWith(filter) || tag.startsWith("el-"+filter)) {
+                                    completionResultSet.addItem(new VueCompletionItem(tag,tag, startOffset, caretOffset));
+                                }
+                            }
                         }
-//                        if(i==0){
-//                            for (String attribute : VueData.getDocKeys()) {
-//                                if (attribute!=null&&attribute.startsWith(filter)) {
-//                                    completionResultSet.addItem(new VueCompletionItem(currentTag.trim(),attribute, startOffset, caretOffset));
-//                                }
-//                            
-//                            }
-//                            
-//                        }
+                    }else{
+                        //标签内属性
+                        if (!CompletionUtils.insideAttribute((StyledDocument) document, caretOffset)) {
+                            String prefix = "";
+                            if(filter.startsWith(":")||filter.startsWith("@")){
+                                prefix = filter.substring(0, 1);
+                                filter = filter.substring(1);
+                            }
+                            for (String attribute : VueData.getVueAttributes(currentTag.trim())) {
+                                if (attribute.startsWith(filter)) {
+                                    completionResultSet.addItem(new VueCompletionItem(currentTag.trim(),prefix+attribute, startOffset, caretOffset));
+                                }
+
+                            }
+                        }
                     }
                     
                 } catch (BadLocationException ex) {

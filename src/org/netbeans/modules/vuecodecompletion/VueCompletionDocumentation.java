@@ -37,15 +37,18 @@ public class VueCompletionDocumentation implements CompletionDocumentation {
     public String getText() {
         String docLocation = "http://element-cn.eleme.io/#/zh-CN/component/"+item.getTag().substring(3);
         String tagDoc = VueData.getDoc(item.getTag());
-        String attrDoc = VueData.getDoc(item.getAttribute());
-        if(attrDoc == null){
-            attrDoc = VueData.getDoc(item.getTag().substring(3)+"/"+item.getAttribute());
-            if(attrDoc==null){
-                attrDoc = "没有文档";
-            }
-        }
         String documentation = "<h1>ElementUi </h1><h2>"+item.getTag()+"组件</h2>"+tagDoc;
-        documentation += "<h3>"+item.getAttribute()+"属性</h3>"+attrDoc+ "<p><b>网页文档</b></p><p><a href=\""+docLocation+"\">"+docLocation+"</a></p>";
+        if(item.getAttribute()!=null){
+            String attrDoc = VueData.getDoc(item.getAttribute());
+            if(attrDoc == null){
+                attrDoc = VueData.getDoc(item.getTag().substring(3)+"/"+item.getAttribute());
+                if(attrDoc==null){
+                    attrDoc = "没有属性文档";
+                }
+            }
+            documentation += "<h3>"+item.getAttribute()+"属性</h3>"+attrDoc;
+        }
+        documentation +="<p><b>网页文档</b></p><p><a href=\""+docLocation+"\">"+docLocation+"</a></p>";
         return documentation ;
     }
 

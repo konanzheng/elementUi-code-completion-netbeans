@@ -63,7 +63,12 @@ public class VueCompletionItem implements CompletionItem {
         return text;
     }
     public String getAttribute(){
+        if( text.equals(this.tag)){
+            //标签
+            return null;
+        }
         if(text.startsWith(":")||text.startsWith("@")){
+            //属性
             return text.substring(1);
         }
         return text;
@@ -90,7 +95,12 @@ public class VueCompletionItem implements CompletionItem {
             if (caretOffset != dotOffset) {
                 doc.remove(dotOffset, indexOfWhite);
             }
-            if (text.startsWith(":") || text.startsWith("@") ) {
+            if(text.equals(tag)){
+                //标签插入
+                String content = "<"+text+" ></"+text+">";
+                doc.insertString(dotOffset, content, null);
+                caret.setDot(caret.getDot() - text.length()-4);
+            }else  if (text.startsWith(":") || text.startsWith("@") ) {
                 String attribute = text + "=\"\"";
                 if (caretOffset == dotOffset) {
                     attribute += " ";
